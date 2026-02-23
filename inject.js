@@ -21,6 +21,13 @@ function load() {
       }, 100);
     });
   }
+  Mousetrap.bind('ctrl+shift+e', function(e) {
+    e.preventDefault();
+    var storage = (typeof chrome !== 'undefined' && chrome.storage) ? chrome.storage : browser.storage;
+    storage.sync.get(['customSignature'], function(data) {
+      insertSignature(signatureToHtml(data.customSignature));
+    });
+  });
   Mousetrap.bind('ctrl+,', confirmEmail);
   Mousetrap.bind('ctrl+f', confirmEmail);
   Mousetrap.bind('ctrl+y', function(e) {
@@ -46,6 +53,16 @@ function clickReply() {
 
 function setReply(html) {
   document.querySelector('div.editable[id][contenteditable][g_editable]').innerHTML = html;
+}
+
+function insertSignature(html) {
+  var editable = document.activeElement && document.activeElement.closest
+    ? document.activeElement.closest('div[contenteditable="true"]')
+    : null;
+  if (!editable) editable = document.querySelector('div.editable[id][contenteditable][g_editable]');
+  if (!editable) return;
+  editable.focus();
+  document.execCommand('insertHTML', false, html);
 }
 
 function setReplyEmail(email) {
